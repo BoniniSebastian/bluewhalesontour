@@ -1,17 +1,12 @@
 import { db } from "./firebase.js";
 import {
   collection,
-  addDoc,
   onSnapshot,
   doc,
   setDoc,
-  deleteDoc,
-  query,
-  orderBy
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-
-// 🔑 unik användare
 function getUserId() {
   let id = localStorage.getItem("userId");
   if (!id) {
@@ -21,48 +16,6 @@ function getUserId() {
   return id;
 }
 
-
-// 🪟 popup
-window.openPopup = (type) => {
-  document.getElementById(type + "-popup").classList.remove("hidden");
-};
-
-window.closePopup = () => {
-  document.querySelectorAll(".popup").forEach(p => p.classList.add("hidden"));
-};
-
-
-// 💬 BLUEWALL
-window.addPost = async () => {
-  const input = document.getElementById("postInput");
-  if (!input.value) return;
-
-  await addDoc(collection(db, "posts"), {
-    text: input.value,
-    createdAt: Date.now()
-  });
-
-  input.value = "";
-};
-
-onSnapshot(
-  query(collection(db, "posts"), orderBy("createdAt", "desc")),
-  (snap) => {
-    const div = document.getElementById("posts");
-    div.innerHTML = "";
-
-    snap.forEach(doc => {
-      const p = doc.data();
-      div.innerHTML += `
-        <p>${p.text}<br>
-        <small>${new Date(p.createdAt).toLocaleString()}</small></p>
-      `;
-    });
-  }
-);
-
-
-// 👍 MATCH – toggle + färg
 window.toggleAttend = async (matchId, btn) => {
   const userId = getUserId();
   const ref = doc(db, "matches", matchId, "attendees", userId);
@@ -81,39 +34,69 @@ window.toggleAttend = async (matchId, btn) => {
 };
 
 
-// 📅 MATCHER
+// 🔥 GRUPPERA PER DAG
+function groupByDate(matches) {
+  const grouped = {};
+
+  matches.forEach(m => {
+    if (!grouped[m.date]) grouped[m.date] = [];
+    grouped[m.date].push(m);
+  });
+
+  return grouped;
+}
+
+
 onSnapshot(collection(db, "matches"), (snap) => {
   const container = document.getElementById("timeline");
   container.innerHTML = "";
 
+  let matches = [];
+
   snap.forEach(docSnap => {
-    const m = docSnap.data();
+    matches.push({
+      id: docSnap.id,
+      ...docSnap.data()
+    });
+  });
 
-    const el = document.createElement("div");
-    el.className = "match-card";
+  // sortera
+  matches.sort((a, b) => a.time.localeCompare(b.time));
 
-    el.innerHTML = `
-      <div class="match-info">
-        <b>${m.time}</b><br>
-        ${m.team}<br>
-        vs ${m.opponent}<br>
-        ${m.location}
-      </div>
+  const grouped = groupByDate(matches);
 
-      <div>
-        <button onclick="toggleAttend('${docSnap.id}', this)">👍</button>
-        <div id="count-${docSnap.id}">0</div>
-      </div>
-    `;
+  Object.keys(grouped).forEach(date => {
 
-    container.appendChild(el);
+    const day = document.createElement("div");
+    day.innerHTML = `<div class="day">${date}</div>`;
+    container.appendChild(day);
 
-    // 🔢 counter live
-    onSnapshot(
-      collection(db, "matches", docSnap.id, "attendees"),
-      (s) => {
-        document.getElementById("count-" + docSnap.id).innerText = s.size;
-      }
-    );
+    grouped[date].forEach(m => {
+      const el = document.createElement("div");
+      el.className = "match-card";
+
+      el.innerHTML = `
+        <div>
+          <b>${m.time}</b><br>
+          ${m.team}<br>
+          vs ${m.opponent}<br>
+          ${m.location}
+        </div>
+
+        <div>
+          <button onclick="toggleAttend('${m.id}', this)">👍</button>
+          <div id="count-${m.id}">0</div>
+        </div>
+      `;
+
+      container.appendChild(el);
+
+      onSnapshot(
+        collection(db, "matches", m.id, "attendees"),
+        (s) => {
+          document.getElementById("count-" + m.id).innerText = s.size;
+        }
+      );
+    });
   });
 });
