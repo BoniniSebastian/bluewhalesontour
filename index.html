@@ -9,7 +9,11 @@
 <body>
 
 <div class="topbar">
-  <div class="logo">🐋 Bluewhales</div>
+  <div class="logo">🐋 Bluewhales on Tour</div>
+
+  <a href="https://malarenergicup.vib.se/2026,sv/result/clubs/73836758" target="_blank" class="top-link">
+    🔗 Länk Mälarenergi
+  </a>
 </div>
 
 <!-- BLUEWALL PREVIEW -->
@@ -27,11 +31,13 @@
     <h2>💬 Bluewall</h2>
 
     <textarea id="postInput" placeholder="Skriv något..."></textarea>
-    <button onclick="addPost()">Posta</button>
+
+    <div class="popup-buttons">
+      <button onclick="addPost()">Posta</button>
+      <button onclick="closePopup()">Stäng</button>
+    </div>
 
     <div id="posts"></div>
-
-    <button onclick="closePopup()">Stäng</button>
   </div>
 </div>
 
