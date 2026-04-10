@@ -59,7 +59,6 @@ setInterval(() => {
   index = (index + 1) % posts.length;
 }, 3000);
 
-
 // MATCH
 window.toggleAttend = async (matchId, btn) => {
   const userId = getUserId();
@@ -78,16 +77,17 @@ window.toggleAttend = async (matchId, btn) => {
   }
 };
 
-
-// DAGNAMN
-function formatDay(dateStr) {
-  const d = new Date(dateStr);
-  const days = ["SÖNDAG","MÅNDAG","TISDAG","ONSDAG","TORSDAG","FREDAG","LÖRDAG"];
-  return days[d.getDay()];
+// DAG
+function formatDay(day) {
+  const map = {
+    fredag: "FREDAG",
+    lördag: "LÖRDAG",
+    söndag: "SÖNDAG"
+  };
+  return map[day] || day;
 }
 
-
-// HÄMTA MATCHER
+// MATCHER
 onSnapshot(collection(db, "matches"), (snap) => {
   const container = document.getElementById("timeline");
   container.innerHTML = "";
@@ -101,22 +101,20 @@ onSnapshot(collection(db, "matches"), (snap) => {
     });
   });
 
-  matches.sort((a, b) => a.time.localeCompare(b.time));
-
   const grouped = {};
 
   matches.forEach(m => {
-    if (!grouped[m.date]) grouped[m.date] = [];
-    grouped[m.date].push(m);
+    if (!grouped[m.day]) grouped[m.day] = [];
+    grouped[m.day].push(m);
   });
 
-  Object.keys(grouped).forEach(date => {
+  Object.keys(grouped).forEach(day => {
 
-    const day = document.createElement("div");
-    day.innerHTML = `<div class="day">${formatDay(date)}</div>`;
-    container.appendChild(day);
+    const dayEl = document.createElement("div");
+    dayEl.innerHTML = `<div class="day">${formatDay(day)}</div>`;
+    container.appendChild(dayEl);
 
-    grouped[date].forEach(m => {
+    grouped[day].forEach(m => {
 
       const el = document.createElement("div");
       el.className = "match-card";
@@ -127,12 +125,17 @@ onSnapshot(collection(db, "matches"), (snap) => {
           <div>${m.team}</div>
           <div>vs ${m.opponent}</div>
           <div class="location">${m.location}</div>
-          <div class="attending">På plats: <span id="count-${m.id}">0</span></div>
         </div>
 
-        <button class="attend-btn" onclick="toggleAttend('${m.id}', this)">
-          ✔
-        </button>
+        <div class="attend-box">
+          <button class="attend-btn" onclick="toggleAttend('${m.id}', this)">
+            ✔
+          </button>
+          <div class="attend-count">
+            <span id="count-${m.id}">0</span>
+            <div class="attend-label">Ska se matchen live</div>
+          </div>
+        </div>
       `;
 
       container.appendChild(el);
