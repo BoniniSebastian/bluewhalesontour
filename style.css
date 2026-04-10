@@ -1,67 +1,111 @@
 body {
+  margin: 0;
   font-family: sans-serif;
-  background: #f5f5f5;
-  margin: 0;
-}
-
-.topbar {
-  position: sticky;
-  top: 0;
-  background: white;
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #eee;
-}
-
-.topbar h2 {
-  margin: 0;
-  font-size: 16px;
-}
-
-button {
-  padding: 6px 10px;
-  border-radius: 20px;
-  border: none;
-  background: #1976d2;
   color: white;
+
+  background: url("assets/bg.jpg") no-repeat center center fixed;
+  background-size: cover;
 }
 
-.day {
-  padding: 10px;
+/* overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.35);
+  z-index: -1;
+}
+
+/* TOP */
+.topbar {
+  padding: 15px;
   font-weight: bold;
-  color: #666;
 }
 
-.match-card {
-  background: white;
+/* BLUEWALL */
+.bluewall-preview {
   margin: 10px;
   padding: 12px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  border-radius: 16px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
 }
 
-.match-info {
-  font-size: 14px;
+/* MATCHER */
+.match-card {
+  margin: 10px;
+  padding: 12px;
+  border-radius: 16px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
 }
 
+.time {
+  font-size:18px;
+  font-weight:bold;
+}
+
+.location {
+  font-size:12px;
+  opacity:0.8;
+}
+
+.attending {
+  font-size:12px;
+  margin-top:5px;
+}
+
+/* NEON KNAPP */
+.attend-btn {
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  border:none;
+  background:#111;
+  color:#00ff88;
+  font-size:20px;
+
+  box-shadow:
+    0 0 5px #00ff88,
+    0 0 10px #00ff88,
+    0 0 20px #00ff88;
+}
+
+/* DAG */
+.day {
+  margin: 15px 10px 5px;
+  font-size:14px;
+  opacity:0.8;
+}
+
+/* POPUP */
 .popup {
   position: fixed;
   top:0; left:0;
   width:100%; height:100%;
+
+  backdrop-filter: blur(15px);
   background: rgba(0,0,0,0.5);
+
+  display:flex;
 }
 
 .popup-content {
-  background:white;
-  margin:50px auto;
+  width:100%;
+  height:100%;
   padding:20px;
-  width:90%;
-  max-width:400px;
-  border-radius:12px;
+  overflow:auto;
 }
 
 .hidden {
@@ -71,5 +115,5 @@ button {
 textarea {
   width:100%;
   height:80px;
-  margin-bottom:10px;
+  margin:10px 0;
 }
